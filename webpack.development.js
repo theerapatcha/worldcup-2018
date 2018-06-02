@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 process.env.NODE_ENV = 'development';
 
 module.exports = merge(webpackConfig, {
+  mode: process.env.NODE_ENV,
   devtool: '#cheap-module-source-map',
   entry: {
     app: ['webpack-hot-middleware/client'],
@@ -17,6 +18,10 @@ module.exports = merge(webpackConfig, {
     chunkFilename: '[name]_[chunkhash:8].js',
   },
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+      minimize: false,
+      debug: true
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({

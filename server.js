@@ -21,5 +21,5 @@ app.listen(app.get('port'), function(err) {
   if (err) {
     console.log(err);
   }
-  console.log('Port is '+ app.get('port') +', please wait to build ...');
+  console.log('Port is '+ app.get('port') +', Env is '+process.env.NODE_ENV +' please wait to build ...');
 });

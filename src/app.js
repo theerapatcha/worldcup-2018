@@ -8,7 +8,7 @@ import createHistory from 'history/createBrowserHistory'
 import { Route } from 'react-router'
 
 import { ConnectedRouter, routerReducer, routerMiddleware, push } from 'react-router-redux'
-
+import thunk from 'redux-thunk';
 import reducers from './reducers' // Or wherever you keep your reducers
 import Routes from './routes'
 // Create a history of your choosing (we're using a browser history in this case)
@@ -24,7 +24,7 @@ const store = createStore(
     ...reducers,
     router: routerReducer
   }),
-  applyMiddleware(middleware)
+  applyMiddleware(thunk, middleware)
 )
 
 // Now you can dispatch navigation actions from anywhere!

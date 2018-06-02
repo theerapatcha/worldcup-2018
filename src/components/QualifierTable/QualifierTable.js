@@ -1,17 +1,21 @@
 import React from 'react'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
+import { Table } from 'react-bootstrap'
+import GroupMatchesModal from './components/GroupMatchesModal';
 
 class QualifierTable extends React.Component {
     constructor(props) {
         super(props)
+        this.showMatchesModal = this.showMatchesModal.bind(this);
+        this.closeMatchesModal = this.closeMatchesModal.bind(this);
         this.state = {
             groupName: 'Group Z',
-            sortedTeamsWitResult: []
+            sortedTeamsWitResult: [],
+            isShowMatchesModal: false
         }
     }
-    componentDidMount(){
-        console.log(this.props.retrieveQualifierResults)
-        this.props.retrieveQualifierResults(this.props.groupId)
+    componentWillMount(){
+        this.props.retrieveQualifierGroupInfo(this.props.groupId)
     }
     componentWillReceiveProps(nextProps) {
         const { groupId, group } = nextProps;
@@ -19,24 +23,40 @@ class QualifierTable extends React.Component {
         this.state.sortedTeamsWitResult = group.teams;
         this.state.groupName = group.groupName
     }
+    showMatchesModal() {
+        this.setState({
+            isShowMatchesModal: true
+        })
+    }
+    closeMatchesModal() {
+        this.setState({
+            isShowMatchesModal: false
+        })
+    }
     render() {
         return (
             <div>
                 <h4>{this.state.groupName}</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Team</th>
-                        <th>Played</th>
-                        <th>Win</th>
-                        <th>Draw</th>
-                        <th>Lose</th>
-                        <th>Agg.</th>
-                        <th>Points</th>
-                    </tr>
-                </thead>
-                {this.renderTeamInGroup()}
-            </table>
+                <span onClick={this.showMatchesModal}>View matches</span>
+                <Table className={'small'}>
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Played</th>
+                            <th>Win</th>
+                            <th>Draw</th>
+                            <th>Lose</th>
+                            <th>Agg.</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    {this.renderTeamInGroup()}
+                </Table>
+                <GroupMatchesModal 
+                    isShow={this.state.isShowMatchesModal} 
+                    groupId={this.props.groupId} 
+                    onHide={this.closeMatchesModal}
+                />
             </div>
         )
     }

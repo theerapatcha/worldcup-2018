@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -7,7 +8,9 @@ module.exports = {
       'redux',
       'react-redux',
       'react-router',
-      'react-router-redux'
+      'react-router-redux',
+      'bootstrap',
+      'jquery'
     ],
     react: [
       'react',
@@ -23,6 +26,12 @@ module.exports = {
       path.join(__dirname, 'src'),
       path.join(__dirname, 'node_modules'),
     ],
+    alias: {
+      components: path.join(__dirname, 'src', 'components'),
+      actions: path.join(__dirname, 'src', 'actions'),
+      reducers: path.join(__dirname, 'src', 'reducers'),
+      datasource: path.join(__dirname, 'src', 'datasource')
+    },
     extensions: ['.js', '.jsx'],
   },
   module: {
@@ -32,12 +41,12 @@ module.exports = {
       exclude: /node_modules/,
     }, {
       test: /\.css$/,
-      use: ['style-loader', 'css-loader?importLoaders=1', 'postcss-loader'],
-      include: /components/,
+      use: ['style-loader', 'css-loader?importLoaders=1'],
+      //include: /components/,
     }, {
       test: /\.scss$/,
-      use: ['style-loader', 'css-loader?importLoaders=1', 'sass-loader', 'postcss-loader'],
-      include: /components/,
+      use: ['style-loader', 'css-loader?importLoaders=1', 'sass-loader'],
+      //include: /components/,
     }, {
       test: /\.(jpe?g|png|gif|svg|ico)/i,
       loader: 'file-loader?name=img_[hash:8].[ext]',
@@ -46,4 +55,10 @@ module.exports = {
       loader: 'file-loader',
     }],
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
+  ]
 };
