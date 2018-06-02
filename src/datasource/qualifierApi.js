@@ -14,60 +14,36 @@ export const fetchQualifierGroupInfo = (groupId) => {
 }
 
 export const fetchQualifierGroupMatches = (groupId) => {
-    return later(20, {
-        groupId,
-        matches: [
-            {
-                matchId: 1,
-                team1: {
-                    teamId: 1,
-                    teamName: 'Germany',
-                    teamAbbr: 'GER'
-                },
-                team2: {
-                    teamId: 2,
-                    teamName: 'Portugal',
-                    teamAbbr: 'POR'
-                },
-                result: null,
-                status: 'U',
-                date: 1627932832784
-            },
-            {
-                matchId: 1,
-                team1: {
-                    teamId: 1,
-                    teamName: 'Germany',
-                    teamAbbr: 'GER'
-                },
-                team2: {
-                    teamId: 2,
-                    teamName: 'Portugal',
-                    teamAbbr: 'POR'
-                },
-                result: [1,2],
-                status: 'LP',
-                date: 1527932832784
-            },
-            {
-                matchId: 1,
-                team1: {
-                    teamId: 1,
-                    teamName: 'Germany',
-                    teamAbbr: 'GER'
-                },
-                team2: {
-                    teamId: 2,
-                    teamName: 'Portugal',
-                    teamAbbr: 'POR'
-                },
-                result: [2,1],
-                status: 'W',
-                date: 1529932832784
-            }
-        ]
-        
-    })
+    return fetch('https://raw.githubusercontent.com/lsv/fifa-worldcup-2018/master/data.json').then((response) => { 
+        return response.json() 
+    }).then((data) => {
+        return processGroupInfo(data);
+    }).then((groups) => {
+        const group = groups[groupId.toLowerCase()];
+        return {
+            groupId,
+            matches: group.matches.map((match) => {
+                return {
+                    matchId: match.name,
+                    team1: {
+                        teamId: match.home_team,
+                        teamName: match.home_team_info.name,
+                        teamAbbr: match.home_team_info.fifaCode,
+                        teamEmoji: match.home_team_info.emojiString
+                    },
+                    team2: {
+                        teamId: match.away_team,
+                        teamName: match.away_team_info.name,
+                        teamAbbr: match.away_team_info.fifaCode,
+                        teamEmoji: match.away_team_info.emojiString
+                    },
+                    result: (match.home_result && match.away_result)? [match.home_result, match.away_result] : null,
+                    status: '',
+                    date: new Date(match.date).getTime()
+                }
+            })
+        }
+    });
 }
 function later(delay, value) {
     return new Promise(function(resolve) {
@@ -90,13 +66,12 @@ const processGroupInfo = (data) => {
         const teams = [];
         groups[key].matches.map((match) => {
             const homeTeamId = match.home_team;
-            const homeTeamName = teamsInfo.getTeamById(homeTeamId).name;
+            match.home_team_info = teamsInfo.getTeamById(homeTeamId);
+            const homeTeamName = match.home_team_info.name;
 
             const awayTeamId = match.away_team;
-            const awayTeamName = teamsInfo.getTeamById(awayTeamId).name;
-
-            match.home_team_name = homeTeamName
-            match.away_team_name = awayTeamName;
+            match.away_team_info = teamsInfo.getTeamById(awayTeamId);
+            const awayTeamName = match.away_team_info.name;
             
             const homeTeamIndex = teams.findIndex((team) => {
                 return team.teamId == homeTeamId;
