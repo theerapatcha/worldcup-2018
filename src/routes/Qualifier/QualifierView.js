@@ -10,30 +10,30 @@ class QualifierView extends React.Component {
             <Grid>
                 <Row>
                     <Col md={3}>
-                        <QualifierTable groupId={1}/>
+                        <QualifierTable groupId={'a'}/>
                     </Col>
                     <Col md={3}>
-                        <QualifierTable groupId={2}/>
+                        <QualifierTable groupId={'b'}/>
                     </Col>
                     <Col md={3}>
-                        <QualifierTable groupId={3}/>
+                        <QualifierTable groupId={'c'}/>
                     </Col>
                     <Col md={3}>
-                        <QualifierTable groupId={4}/>
+                        <QualifierTable groupId={'d'}/>
                     </Col>
                 </Row>
                 <Row>
                     <Col md={3}>
-                        <QualifierTable groupId={5}/>
+                        <QualifierTable groupId={'e'}/>
                     </Col>
                     <Col md={3}>
-                        <QualifierTable groupId={6}/>
+                        <QualifierTable groupId={'f'}/>
                     </Col>
                     <Col md={3}>
-                        <QualifierTable groupId={7}/>
+                        <QualifierTable groupId={'g'}/>
                     </Col>
                     <Col md={3}>
-                        <QualifierTable groupId={8}/>
+                        <QualifierTable groupId={'h'}/>
                     </Col>
                 </Row>
             </Grid>

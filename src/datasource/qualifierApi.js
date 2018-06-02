@@ -1,14 +1,16 @@
 export const fetchQualifierGroupInfo = (groupId) => {
-    return later(20, {
-        groupId,
-        groupName: 'Group '+groupId,
-        teams: [
-            { teamId: 1, teamName: 'Germany', win: 3, draw: 0, lose: 1, played: 4, goalFor: 19, goalAgainst: 2, points: 9 },
-            { teamId: 2, teamName: 'Portugal', win: 2, draw: 1, lose: 1, played: 4, goalFor: 9, goalAgainst: 2, points: 7 },
-            { teamId: 3, teamName: 'Argen', win: 1, draw: 1, lose: 1, played: 3, goalFor: 3, goalAgainst: 2, points: 4 },
-            { teamId: 4, teamName: 'England', win: 0, draw: 2, lose: 1, played: 3, goalFor: 1, goalAgainst: 2, points: 2 }
-        ]
-    })
+    return fetch('https://raw.githubusercontent.com/lsv/fifa-worldcup-2018/master/data.json').then((response) => { 
+        return response.json() 
+    }).then((data) => {
+        return processGroupInfo(data);
+    }).then((groups) => {
+        const group = groups[groupId.toLowerCase()];
+        return {
+            groupId,
+            groupName: group.name,
+            teams: group.teamFixtures
+        }
+    });
 }
 
 export const fetchQualifierGroupMatches = (groupId) => {
@@ -78,4 +80,82 @@ function later(delay, value) {
         setTimeout(resolve.bind(null, value), delay);
         */
     });
+}
+
+const processGroupInfo = (data) => {
+    const teamsInfo = processTeamInfo(data.teams);
+    const groups = data.groups;
+
+    Object.keys(groups).forEach((key) => {
+        const teams = [];
+        groups[key].matches.map((match) => {
+            const homeTeamId = match.home_team;
+            const homeTeamName = teamsInfo.getTeamById(homeTeamId).name;
+
+            const awayTeamId = match.away_team;
+            const awayTeamName = teamsInfo.getTeamById(awayTeamId).name;
+
+            match.home_team_name = homeTeamName
+            match.away_team_name = awayTeamName;
+            
+            const homeTeamIndex = teams.findIndex((team) => {
+                return team.teamId == homeTeamId;
+            });
+
+            const awayTeamIndex = teams.findIndex((team) => {
+                return team.teamId == awayTeamId;
+            });
+
+            createOrUpdateTeams(homeTeamIndex, teams, homeTeamId, homeTeamName, match.finished, match.home_team_result, match.away_team_result);
+            createOrUpdateTeams(awayTeamIndex, teams, awayTeamId, awayTeamName, match.finished, match.away_team_result, match.home_team_result);
+            
+            return match;
+        });
+        groups[key].teamFixtures = teams;
+    });
+
+    return groups;
+}
+
+const processTeamInfo = (data) => {
+    const teams = { list: data };
+    teams.getTeamById = (id) => {
+        return teams.list[id-1];
+    }
+    return teams;
+}
+
+const createOrUpdateTeams = (teamIndex, teams, id, name, finished, result, againstResult ) => {
+    if (teamIndex > -1) {
+        // Update
+        let team = teams[teamIndex];
+        team.teamName = name;
+        if (finished) team.played += 1;
+
+        if (result) {
+            if (result > againstResult) {
+                team.win += 1;
+                team.points += 3;
+            } else if (result == againstResult) {
+                team.draw += 1;
+                team.points += 1;
+            } else if (result < againstResult) team.lose += 1;
+
+            team.goalFor += result;
+            team.goalAgainst += againstResult;
+        }
+    } else {
+        // Create
+        teams.push({
+            teamId: id,
+            teamName: name,
+            played: 0,
+            win: 0,
+            draw: 0,
+            lose: 0,
+            goalFor: 0,
+            goalAgainst: 0,
+            points: 0
+        });
+    }
 }
