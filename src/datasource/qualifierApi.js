@@ -111,7 +111,7 @@ const processGroupInfo = (data) => {
             
             return match;
         });
-        groups[key].teamFixtures = teams;
+        groups[key].teamFixtures = teams.sort(compareFixtures);
     });
 
     return groups;
@@ -157,5 +157,13 @@ const createOrUpdateTeams = (teamIndex, teams, id, name, finished, result, again
             goalAgainst: 0,
             points: 0
         });
+    }
+}
+
+const compareFixtures = (a, b) => {
+    if (a.points < b.points) return -1;
+    if (a.points > b.points) return 1;
+    if (a.points == b.points) {
+        return a.teamName.localeCompare(b.teamName);
     }
 }
